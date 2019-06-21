@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<modification
+		xmlns="https://github.com/vqmod/vqmod"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/vqmod/vqmod https://raw.githubusercontent.com/vqmod/vqmod/master/vqmod.xsd"
+		>
+		<id><![CDATA[[VQMOD] Add BRAND, MODEL, SKU & "VIEW PRODUCT" button on all lists]]></id>
+		<version>1.1.0</version>
+		<vqmver>2.6.3</vqmver>
+		<author>kanenas.net (aka Nikolas Branis) - nbran@kanenas.net</author>
+		<!-- START Category, Manufacturer, Search, Special pages -->
+		<file path="catalog/language/greek/product/" name="category.php,manufacturer.php,search.php,special.php" error="log">
+			<operation error="skip">
+				<search position="replace"><![CDATA[$_['text_model']        = 'Κωδικός Προϊόντος:';]]></search>
+				<add><![CDATA[$_['text_model']        = 'Κωδικός:';]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[// Text]]></search>
+				<add><![CDATA[
+$_['text_sku']        = 'SKU:';
+$_['text_view_product'] = 'ΔΕΙΤΕ ΤΟ ΠΡΟΪΟΝ';
+				]]></add>
+			</operation>
+		</file>
+		<file path="catalog/language/english/product/" name="category.php,manufacturer.php,search.php,special.php" error="log">
+			<operation error="skip">
+				<search position="replace"><![CDATA[$_['text_model']        = 'Product Code:';]]></search>
+				<add><![CDATA[$_['text_model']        = 'Code:';]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[// Text]]></search>
+				<add><![CDATA[
+$_['text_sku']        = 'SKU:';
+$_['text_view_product'] = 'VIEW PRODUCT';
+				]]></add>
+			</operation>
+		</file>
+		<file path="catalog/controller/product/" name="category.php,manufacturer.php,search.php,special.php" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[$data['text_model'] = $this->language->get('text_model');]]></search>
+				<add><![CDATA[
+			$data['text_sku'] = $this->language->get('text_sku');
+			$data['text_view_product'] = $this->language->get('text_view_product');
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA['name'        => $result['name'],]]></search>
+				<add><![CDATA[
+					'model'           => $result['model'],
+					'sku'             => $result['sku'],
+					'manufacturer'    => $result['manufacturer'],
+					'manufacturer_id' => $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id']),
+				]]></add>
+			</operation>
+		</file>
+		<file path="catalog/view/theme/*/template/product/" name="category.tpl,manufacturer_info.tpl,search.tpl,special.tpl" error="log">
+			<operation error="skip">
+				<search position="before"><![CDATA[<h4 class="name"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a></h4>]]></search>
+				<add><![CDATA[                <div class="knns-brand"><a class="gp_brand" href="<?php echo $product['manufacturer_id']; ?>" title="<?php echo $product['manufacturer']; ?>"><?php echo $product['manufacturer']; ?></a></div>]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[<h4 class="name"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a></h4>]]></search>
+				<add><![CDATA[
+                    <?php if ($product['model']) { ?><span class="knns-model"><?php echo $text_model; ?> <?php echo $product['model']; ?></span><?php } ?>
+					<?php if ($product['sku']) { ?><span class="knns-sku"><?php echo $text_sku; ?> <?php echo $product['sku']; ?></span><?php } ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[<div class="button-group">]]></search>
+				<add><![CDATA[<div class="knns-cart"><a href="<?php echo $product['href']; ?>" class="button"><?php echo $text_view_product; ?></a></div>]]></add>
+			</operation>
+		</file>
+		<!-- END Category, Manufacturer, Search, Special pages -->
+
+		<!-- START journal2/module Carousel, Custom Section -->
+		<file path="catalog/controller/module/" name="journal2_carousel.php" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[        $this->load->model('tool/image');]]></search>
+				<add><![CDATA[        $this->load->language('product/category');]]></add>
+			</operation>
+		</file>
+		<file path="catalog/controller/module/" name="journal2_carousel.php,journal2_custom_sections.php" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[$this->data['text_tax'] = $this->language->get('text_tax');]]></search>
+				<add><![CDATA[
+                    $this->data['text_model'] = $this->language->get('text_model');
+                    $this->data['text_sku'] = $this->language->get('text_sku');
+                    $this->data['text_view_product'] = $this->language->get('text_view_product');
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA['name'          => $product['name'],]]></search>
+				<add><![CDATA[
+                    'model'           => $product['model'],
+                    'sku'             => $product['sku'],
+                    'manufacturer'    => $product['manufacturer'],
+                    'manufacturer_id' => $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $product['manufacturer_id']),
+				]]></add>
+			</operation>
+		</file>
+		<file path="catalog/view/theme/journal2/template/journal2/module/" name="carousel_product.tpl,custom_sections_product.tpl" error="log">
+			<operation error="skip">
+				<search position="before"><![CDATA[<div class="name"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a></div>]]></search>
+				<add><![CDATA[                                            <div class="knns-brand"><a class="gp_brand" href="<?php echo $product['manufacturer_id']; ?>" title="<?php echo $product['manufacturer']; ?>"><?php echo $product['manufacturer']; ?></a></div>]]></add>
+			</operation>
+		</file>
+		<file path="catalog/view/theme/journal2/template/journal2/module/" name="carousel_product.tpl,custom_sections_product.tpl" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[<div class="name"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a></div>]]></search>
+				<add><![CDATA[
+                                            <?php if ($product['model']) { ?><div class="knns-model"><?php echo $text_model; ?> <?php echo $product['model']; ?></div><?php } ?>
+                                            <?php if ($product['sku']) { ?><div class="knns-sku"><?php echo $text_sku; ?> <?php echo $product['sku']; ?></div><?php } ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[<div class="button-group">]]></search>
+				<add><![CDATA[<div class="knns-cart"><a href="<?php echo $product['href']; ?>" class="button"><?php echo $text_view_product; ?></a></div>]]></add>
+			</operation>
+		</file>
+		<!-- END journal2/module Carousel, Custom Section -->
+
+		<!-- START journal2/module Super Filter -->
+		<file path="catalog/controller/module/" name="journal2_super_filter.php" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA['name'        => $result['name'],]]></search>
+				<add><![CDATA[
+                'model'           => $result['model'],
+                'sku'             => $result['sku'],
+                'manufacturer'    => $result['manufacturer'],
+                'manufacturer_id' => $this->url->link('product/manufacturer/info', 'manufacturer_id=' . $result['manufacturer_id']),
+				]]></add>
+			</operation>
+		</file>
+		<file path="catalog/view/theme/journal2/template/journal2/module/" name="super_filter_product.tpl" error="log">
+			<operation error="skip">
+				<search position="before"><![CDATA[<h4 class="name"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a></h4>]]></search>
+				<add><![CDATA[                    <div class="knns-brand"><a class="gp_brand" href="<?php echo $product['manufacturer_id']; ?>" title="<?php echo $product['manufacturer']; ?>"><?php echo $product['manufacturer']; ?></a></div>]]></add>
+			</operation>
+		</file>
+		<file path="catalog/view/theme/journal2/template/journal2/module/" name="super_filter_product.tpl" error="log">
+			<operation error="skip">
+				<search position="after"><![CDATA[<h4 class="name"><a href="<?php echo $product['href']; ?>"><?php echo $product['name']; ?></a></h4>]]></search>
+				<add><![CDATA[
+                    <?php if ($product['model']) { ?><span class="knns-model"><?php echo $text_model; ?> <?php echo $product['model']; ?></span><?php } ?>
+                    <?php if ($product['sku']) { ?><span class="knns-sku"><?php echo $text_sku; ?> <?php echo $product['sku']; ?></span><?php } ?>
+				]]></add>
+			</operation>
+			<operation error="skip">
+				<search position="after"><![CDATA[<div class="button-group">]]></search>
+				<add><![CDATA[<div class="knns-cart"><a href="<?php echo $product['href']; ?>" class="button"><?php echo $text_view_product; ?></a></div>]]></add>
+			</operation>
+		</file>
+		<!-- END journal2/module Super Filter -->
+	</modification>
